@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Will You Be My Valentine?</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(135deg, #fde2e4, #fadadd);
+}
+
+/* Floating hearts */
+.heart {
+  position: absolute;
+  background: #ff8fab;
+  transform: rotate(45deg);
+  animation: float 10s linear infinite;
+  opacity: 0.7;
+}
+.heart::before,
+.heart::after {
+  content: "";
+  position: absolute;
+  background: #ff8fab;
+  border-radius: 50%;
+}
+
+@keyframes float {
+  0% { transform: translateY(100vh) rotate(45deg); opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { transform: translateY(-10vh) rotate(45deg); opacity: 0; }
+}
+
+/* Pages */
+.page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: 0.8s ease;
+  padding: 20px;
+}
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.05);
+}
+
+/* Page 1 */
+h1 {
+  font-size: clamp(1.8rem, 6vw, 2.7rem);
+  color: #c9184a;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.buttons {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  height: 120px;
+}
+
+button {
+  padding: 14px 30px;
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  border-radius: 40px;
+  border: none;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+#yes {
+  background: #ff4d6d;
+  color: white;
+  box-shadow: 0 10px 25px rgba(255,77,109,0.4);
+}
+#yes:active { transform: scale(1.08); }
+
+#no {
+  position: absolute;
+  right: 0;
+  background: #adb5bd;
+  color: white;
+}
+
+/* Page 2 */
+#page2 {
+  background: linear-gradient(135deg, #ffe5ec, #fcd5ce);
+  text-align: center;
+}
+
+#page2 h2 {
+  font-size: clamp(1.8rem, 6vw, 2.5rem);
+  color: #9d0208;
+  margin-bottom: 15px;
+}
+
+#page2 p {
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  color: #6a040f;
+  margin-bottom: 25px;
+}
+
+.gif {
+  width: min(260px, 85vw);
+  border-radius: 25px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+/* Hidden YouTube player */
+#player {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Floating hearts -->
+<script>
+const heartCount = window.innerWidth < 600 ? 18 : 30;
+for (let i = 0; i < heartCount; i++) {
+  const h = document.createElement("div");
+  const size = 12 + Math.random() * 18;
+  h.className = "heart";
+  h.style.width = h.style.height = size + "px";
+  h.style.left = Math.random() * 100 + "vw";
+  h.style.animationDuration = 6 + Math.random() * 6 + "s";
+  h.style.borderRadius = "0";
+  h.style.setProperty("--s", size + "px");
+  h.style.setProperty("--c", "#ff8fab");
+  h.style.position = "absolute";
+
+  h.style.setProperty("before", size + "px");
+  document.body.appendChild(h);
+
+  h.style.setProperty("--size", size + "px");
+  h.style.setProperty("--half", size / 2 + "px");
+
+  h.style.setProperty("background", "#ff8fab");
+  h.style.setProperty("transform", "rotate(45deg)");
+
+  h.style.setProperty("before", size + "px");
+  h.style.setProperty("after", size + "px");
+
+  h.style.setProperty("top", Math.random() * 100 + "vh");
+  h.style.setProperty("opacity", 0.7);
+
+  h.style.setProperty("--size", size + "px");
+
+  h.style.setProperty("border-radius", "0");
+
+  h.style.setProperty("before", "50%");
+}
+</script>
+
+<!-- PAGE 1 -->
+<div class="page" id="page1">
+  <h1>Will you be my Valentine? 💘</h1>
+  <div class="buttons">
+    <button id="yes">Yes 💖</button>
+    <button id="no">No 🙃</button>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page hidden" id="page2">
+  <h2>Yayayayayyy 😘💕</h2>
+  <p>I love you the mostttt my Tani babyyyy 😘😘😘✨</p>
+  <img class="gif" src="https://media.giphy.com/media/QaFPEW8KKvouyhQPaj/giphy.gif">
+</div>
+
+<div id="player"></div>
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script>
+const noBtn = document.getElementById("no");
+const yesBtn = document.getElementById("yes");
+const page1 = document.getElementById("page1");
+const page2 = document.getElementById("page2");
+
+const YOUTUBE_VIDEO_ID = "GJNdR_MKuDM";
+let player;
+let userClickedYes = false;
+
+/* Runaway NO button (touch + click) */
+function moveNoButton() {
+  const parent = noBtn.parentElement.getBoundingClientRect();
+  const btn = noBtn.getBoundingClientRect();
+
+  const maxX = parent.width - btn.width;
+  const maxY = parent.height - btn.height;
+
+  const x = Math.random() * maxX;
+  const y = Math.random() * maxY;
+
+  noBtn.style.left = x + "px";
+  noBtn.style.top = y + "px";
+}
+
+noBtn.addEventListener("mouseenter", moveNoButton);
+noBtn.addEventListener("touchstart", moveNoButton);
+noBtn.addEventListener("click", moveNoButton);
+
+/* YES click */
+yesBtn.addEventListener("click", () => {
+  userClickedYes = true;
+  page1.classList.add("hidden");
+  page2.classList.remove("hidden");
+
+  if (player && player.playVideo) {
+    player.playVideo();
+  }
+});
+
+/* YouTube API */
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player("player", {
+    videoId: YOUTUBE_VIDEO_ID,
+    playerVars: {
+      autoplay: 0,
+      controls: 0,
+      loop: 1,
+      playlist: YOUTUBE_VIDEO_ID
+    }
+  });
+}
+</script>
+
+</body>
+</html>
